@@ -29,11 +29,11 @@ def select_image():                   # Lets user select image
         image_category = "image/" + file_extension           # Puts together 'image' category and its suffix
         show_frames(image_frame)          # Switches frame to image frame in order to display image
 
-        loading_label = ctk.CTkLabel(image_frame, text="Analysing Image...", text_color="white")
-        loading_label.grid(row=1, column=1)
+        loading_label = ctk.CTkLabel(image_frame, text="Analysing Image...", text_color="white") # Lets user know program is loading, waiting for response from AI agent
+        loading_label.grid(row=1, column=1) # Places label on image frame
          
         image_description = threading.Thread(target=send_to_API, args=(img_path, image_category, loading_label)) # Sends selected image to API for analysis and fetches AI Agent's description via background thread
-        image_description.start()
+        image_description.start() # Starts background thread
         
 def send_to_API(img_path, image_category, loading_label):   # Sends selected image to API for analysis
     with open(img_path, "rb") as file: # Turns selected image into binary (covertable into base64)
@@ -50,7 +50,7 @@ def send_to_API(img_path, image_category, loading_label):   # Sends selected ima
                 ]
     try:
         response = client.models.generate_content(model="gemini-3.8-flash", contents=contents) # Sends prompt to AI Agent
-    except Exception as error:
+    except Exception as error:                # Error handling
         if getattr(error, "code", None) == 400:
             error_message = "There seems to be a problem with your API key. Please check your API key and try again."
         elif getattr(error, "code", None) == 503:
@@ -63,10 +63,10 @@ def send_to_API(img_path, image_category, loading_label):   # Sends selected ima
     response_received(img_path, response.text, loading_label)
 
 def response_received(img_path, image_description, loading_label):
-    app.after(0, update_GUI, img_path, image_description, loading_label)
+    app.after(0, update_GUI, img_path, image_description, loading_label)  # Leaves background thread to main thread after getting description from AI agent
 
 def update_GUI(img_path, image_description, loading_label):
-    loading_label.destroy()
+    loading_label.destroy()               # Removes loading label
     display_image(img_path, image_description)
 
 def display_image(img_path, image_description):          # Displays the image
@@ -87,14 +87,14 @@ def display_image(img_path, image_description):          # Displays the image
     response_label.grid(row=1, column=1)
 
 def error_received(error_message, loading_label):
-    app.after(0, update_GUI_error, error_message, loading_label)
+    app.after(0, update_GUI_error, error_message, loading_label) # Exits background thread after receiving an error from the AI agent
 
 def update_GUI_error(error_message, loading_label):
-    loading_label.destroy()
+    loading_label.destroy() # Removes the loading label
     display_error(error_message)
 
 def display_error(error_message):
-    error_label = ctk.CTkLabel(image_frame, text=error_message, justify="left", wraplength=screen_width) # Creates an error label
+    error_label = ctk.CTkLabel(image_frame, text=error_message, text_color="white", justify="left", wraplength=screen_width) # Creates an error label
     error_label.grid(row=1, column=1)
 
 def show_frames(frame):                   # Switches to correct frame 
@@ -131,19 +131,19 @@ home_frame.grid(row=0, column=0, sticky="nswe") # Puts home frame in grid to sta
 
 # Background
 
-background_img_path = Image.open(project_folder/"EarthBackground.png")
-background_image = ctk.CTkImage(light_image=background_img_path, dark_image=background_img_path, size=(screen_width, screen_height))
-background_label = ctk.CTkLabel(home_frame, image=background_image, text="")
+background_img_path = Image.open(project_folder/"EarthBackground.png") # Opens background image
+background_image = ctk.CTkImage(light_image=background_img_path, dark_image=background_img_path, size=(screen_width, screen_height)) # Creates background image object
+background_label = ctk.CTkLabel(home_frame, image=background_image, text="") # Creates background image label
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Labels
 
-title_label = ctk.CTkLabel(home_frame, text="Image Analyser", font=("Arial", 25, "bold"),text_color="white", bg_color="#0e0e11", fg_color="#0e0e11")
+title_label = ctk.CTkLabel(home_frame, text="Image Analyser", font=("Arial", 25, "bold"),text_color="white", bg_color="#0e0e11", fg_color="#0e0e11") # Creates label for home-frame title
 title_label.grid(row=0, column=1)
 
 # Buttons
 
-select_image_button = ctk.CTkButton(home_frame, width=25, height=13, command=select_image, text="Select File", text_color="White", font=("Arial",12,"bold"), corner_radius=100, bg_color="#3e5587", fg_color="#96cc33") # Creates button
+select_image_button = ctk.CTkButton(home_frame, width=25, height=13, command=select_image, text="Select File", text_color="White", font=("Arial",12,"bold"), corner_radius=100, bg_color="#3e5587", fg_color="#96cc33") # Creates button to select image
 select_image_button.place(x=screen_width/2 - 28, y=(screen_height/2)-20)      # Adds button to frame
 
 back_button = ctk.CTkButton(image_frame, width=1, height=1, command=lambda: show_frames(home_frame), text="Back", fg_color="red")
