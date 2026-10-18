@@ -9,4 +9,3 @@ Technologies: Python, CustomTkinter, Pillow and the Gemini API.
 How to set up: Download project, run: pip install -r requirements.txt, create a file called ".env" where you have a variable: API_Key = ... (insert your API key insetad of '...').
 
 Then, run the program on Python - and enjoy!
-
